@@ -6,6 +6,7 @@ import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { db } from '@/db/drizzle';
 import { stripe } from '@/lib/stripe';
 import { subscriptions } from '@/db/schema';
+import {APP_URL} from "@/lib/constants";
 
 const app = new Hono()
   .get('/current', clerkMiddleware(), async (c) => {
@@ -37,7 +38,7 @@ const app = new Hono()
       // Если у пользователя уже есть подписка, создаем портал для управления ею
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: existing.customerId ?? '',
-        return_url: `${process.env.NEXT_PUBLIC_APP_URL!}/`,
+        return_url: `${APP_URL}/`,
       });
 
       return c.json({ data: portalSession.url });
@@ -53,8 +54,8 @@ const app = new Hono()
           quantity: 1,
         },
       ],
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL!}/`,
-      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL!}/`,
+      success_url: `${APP_URL}/`,
+      cancel_url: `${APP_URL}/`,
       metadata: {
         userId: auth.userId,
       },
