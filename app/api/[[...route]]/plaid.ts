@@ -20,6 +20,7 @@ import {
   transactions,
 } from '@/db/schema';
 import { convertAmountToMilliUnits } from '@/lib/utils';
+import { translateCategories } from '@/lib/openai';
 
 const configuration = new Configuration({
   basePath: PlaidEnvironments.sandbox,
@@ -129,6 +130,19 @@ const app = new Hono()
       });
 
       const plaidCategories = await client.categoriesGet({});
+      
+      const categoryHierarchies = plaidCategories.data.categories.map(
+        category => category.hierarchy.join(', ')
+      );
+      
+      let translatedHierarchies: string[] = [];
+      try {
+        translatedHierarchies = await translateCategories(categoryHierarchies);
+        console.log(`Успешно переведено ${translatedHierarchies.length} из ${categoryHierarchies.length} категорий`);
+      } catch (error) {
+        console.error("Ошибка при переводе категорий:", error);
+        translatedHierarchies = categoryHierarchies;
+      }
 
       const newAccounts = await db
         .insert(accounts)
@@ -145,9 +159,9 @@ const app = new Hono()
       const newCategories = await db
         .insert(categories)
         .values(
-          plaidCategories.data.categories.map((category) => ({
+          plaidCategories.data.categories.map((category, index) => ({
             id: createId(),
-            name: category.hierarchy.join(', '),
+            name: translatedHierarchies[index] || category.hierarchy.join(', '),
             plaidId: category.category_id,
             userId: auth.userId,
           }))
