@@ -17,12 +17,12 @@ export const useCreateCategory = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Category created :)');
+      toast.success('Категория создана :)');
       // re-fetch all categories everytime you create a new category
       queryClient.invalidateQueries({queryKey: ['categories']});
     },
     onError: () => {
-      toast.error('Failed to create category');
+      toast.error('Не удалось создать категорию');
     },
   });
 };

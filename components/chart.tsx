@@ -45,7 +45,7 @@ export const Chart = ({ data = [] }: Props) => {
   return (
     <Card className="border-none drop-shadow-sm">
       <CardHeader className="flex space-y-2 lg:space-y-0 lg:flex-row lg:items-center justify-between">
-        <CardTitle className="text-xl line-clamp-1">Transactions</CardTitle>
+        <CardTitle className="text-xl line-clamp-1">Операции</CardTitle>
         <Select defaultValue={chartType} onValueChange={onTypeChange}>
           <SelectTrigger className="lg:w-auto h-9 rounded-md px-3">
             <SelectValue placeholder="Chart type" />
@@ -55,19 +55,19 @@ export const Chart = ({ data = [] }: Props) => {
             <SelectItem value="area">
               <div className="flex items-center">
                 <AreaChart className="size-4 mr-2 shrink-0" />
-                <p className="line-clamp-1">Area Chart</p>
+                <p className="line-clamp-1">Зональная диаграмма</p>
               </div>
             </SelectItem>
             <SelectItem value="line">
               <div className="flex items-center">
                 <LineChart className="size-4 mr-2 shrink-0" />
-                <p className="line-clamp-1">Line Chart</p>
+                <p className="line-clamp-1">Линейная диаграмма</p>
               </div>
             </SelectItem>
             <SelectItem value="bar">
               <div className="flex items-center">
                 <BarChart3 className="size-4 mr-2 shrink-0" />
-                <p className="line-clamp-1">Bar Chart</p>
+                <p className="line-clamp-1">Гистограмма</p>
               </div>
             </SelectItem>
           </SelectContent>
@@ -79,7 +79,7 @@ export const Chart = ({ data = [] }: Props) => {
           <div className="flex flex-col gap-y-4 items-center justify-center h-[350px] w-full">
             <FileSearch className="size-6 text-muted-foreground" />
             <p className="text-muted-foreground text-sm">
-              No data for this period
+              Нет данных за выбранный период
             </p>
           </div>
         ) : (

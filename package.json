@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "bun:dev": "bun run next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -14,6 +15,7 @@
   },
   "dependencies": {
     "@clerk/backend": "^1.1.4",
+    "@clerk/localizations": "^3.14.4",
     "@clerk/nextjs": "^5.7.5",
     "@hono/clerk-auth": "^2.0.0",
     "@hono/zod-validator": "^0.2.1",

@@ -15,6 +15,13 @@ type Props = {
 
 const options = ['amount', 'payee', 'date'];
 
+const optionTranslations = {
+  amount: 'сумма',
+  payee: 'получатель',
+  date: 'дата',
+  skip: 'пропустить'
+};
+
 export const TableHeadSelect = ({
   columnIndex,
   selectedColumns,
@@ -32,10 +39,10 @@ export const TableHeadSelect = ({
           currentSelection && 'text-blue-500'
         )}
       >
-        <SelectValue placeholder="Skip" />
+        <SelectValue placeholder="Пропустить" />
       </SelectTrigger>
       <SelectContent>
-        <SelectItem value="skip">Skip</SelectItem>
+        <SelectItem value="skip">Пропустить</SelectItem>
         {options.map((option, index) => {
           const disabled =
             Object.values(selectedColumns).includes(option) &&
@@ -48,7 +55,7 @@ export const TableHeadSelect = ({
               disabled={disabled}
               className="capitalize"
             >
-              {option}
+              {optionTranslations[option as keyof typeof optionTranslations]}
             </SelectItem>
           );
         })}

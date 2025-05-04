@@ -22,8 +22,8 @@ export const Actions = ({ id }: Props) => {
   const { onOpen } = useOpenAccount();
   const deleteMutation = useDeleteAccount(id);
   const [ConfirmDialog, confirm] = useConfirm(
-    'Are you sure?',
-    'You are about to delete these account.'
+    'Вы уверены?',
+    'Вы собираетесь удалить этот счет.'
   );
 
   const handleDelete = async () => {
@@ -52,14 +52,14 @@ export const Actions = ({ id }: Props) => {
             }}
           >
             <Edit className="size-4 mr-2" />
-            Edit
+            Изменить
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}
             onClick={handleDelete}
           >
             <Trash className="size-4 mr-2" />
-            Delete
+            Удалить
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

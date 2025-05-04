@@ -22,10 +22,10 @@ export const useCreateLinkToken = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Link token created :)');
+      toast.success('Токен ссылки создан :)');
     },
     onError: () => {
-      toast.error('Failed to create link token');
+      toast.error('Не удалось создать токен ссылки');
     },
   });
 };

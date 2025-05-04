@@ -15,7 +15,7 @@ export const SubscriptionCheckout = () => {
       onClick={() => checkout.mutate()}
       disabled={checkout.isPending || isLoadingSubscription}
     >
-      {subscription ? 'Manage' : 'Upgrade'}
+      {subscription ? 'Управление' : 'Улучшить'}
     </Button>
   );
 };

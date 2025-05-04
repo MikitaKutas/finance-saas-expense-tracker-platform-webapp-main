@@ -23,7 +23,7 @@ export const useGetTransactions = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch transactions');
+        throw new Error('Не удалось получить транззакции');
       }
 
       const {data} = await response.json();

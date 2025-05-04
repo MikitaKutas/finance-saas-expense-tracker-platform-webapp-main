@@ -22,8 +22,8 @@ export const Actions = ({ id }: Props) => {
   const { onOpen } = useOpenCategory();
   const deleteMutation = useDeleteCategory(id);
   const [ConfirmDialog, confirm] = useConfirm(
-    'Are you sure?',
-    'You are about to delete these category.'
+    'Вы уверены?',
+    'Вы собираетесь удалить эту категорию.'
   );
 
   const handleDelete = async () => {
@@ -52,14 +52,14 @@ export const Actions = ({ id }: Props) => {
             }}
           >
             <Edit className="size-4 mr-2" />
-            Edit
+            Изменить
           </DropdownMenuItem>
           <DropdownMenuItem
             disabled={deleteMutation.isPending}
             onClick={handleDelete}
           >
             <Trash className="size-4 mr-2" />
-            Delete
+            Удалить
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

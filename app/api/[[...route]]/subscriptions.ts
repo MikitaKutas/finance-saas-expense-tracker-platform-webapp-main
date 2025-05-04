@@ -10,7 +10,7 @@ import {APP_URL} from "@/lib/constants";
 
 const app = new Hono()
   .get('/current', clerkMiddleware(), async (c) => {
-    const auth = getAuth(c);
+    const auth =  getAuth(c);
     if (!auth?.userId) {
       return c.json({ error: 'Unauthorized' }, 401);
     }
@@ -35,16 +35,15 @@ const app = new Hono()
       .where(eq(subscriptions.userId, auth.userId));
 
     if (existing?.subscriptionId) {
-      // Если у пользователя уже есть подписка, создаем портал для управления ею
       const portalSession = await stripe.billingPortal.sessions.create({
         customer: existing.customerId ?? '',
         return_url: `${APP_URL}/`,
+        locale: 'ru',
       });
 
       return c.json({ data: portalSession.url });
     }
 
-    // Создаем новую сессию для оформления подписки
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'subscription',
       payment_method_types: ['card'],
@@ -59,11 +58,11 @@ const app = new Hono()
       metadata: {
         userId: auth.userId,
       },
+      locale: 'ru',
     });
 
     return c.json({ data: checkoutSession.url });
   })
-  // Webhook для обработки событий от Stripe
   .post('/webhook', async (c) => {
     const text = await c.req.text();
     const signature = c.req.header('stripe-signature');
@@ -85,11 +84,9 @@ const app = new Hono()
       return c.json({ error: 'Webhook signature verification failed' }, 401);
     }
 
-    // Обработка событий от Stripe
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
       
-      // Создаем запись о подписке
       const customerId = session.customer as string;
       const subscriptionId = session.subscription as string;
       const userId = session.metadata?.userId;

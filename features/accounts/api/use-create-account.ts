@@ -17,12 +17,12 @@ export const useCreateAccount = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Account created :)');
+      toast.success('Счет создан :)');
       // refetch all accounts everytime you create a new account
       queryClient.invalidateQueries({queryKey: ['accounts']});
     },
     onError: () => {
-      toast.error('Failed to create account');
+      toast.error('Не удалось создать счет');
     },
   });
 };

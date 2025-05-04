@@ -23,13 +23,13 @@ export const useBulkDeleteAccounts = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Accounts deleted :)');
+      toast.success('Счета удалены :)');
       // refetch all accounts everytime you create a new account
       queryClient.invalidateQueries({queryKey: ['accounts']});
       queryClient.invalidateQueries({queryKey: ['summary']});
     },
     onError: () => {
-      toast.error('Failed to delete accounts');
+      toast.error('Не удалось удалить счета');
     },
   });
 };

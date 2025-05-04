@@ -24,14 +24,14 @@ export const useEditCategory = (id?: string) => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Category updated :)');
+      toast.success('Категория обновлена :)');
       queryClient.invalidateQueries({queryKey: ['category', {id}]});
       queryClient.invalidateQueries({queryKey: ['categories']});
       queryClient.invalidateQueries({queryKey: ['transactions']});
       queryClient.invalidateQueries({queryKey: ['summary']});
     },
     onError: () => {
-      toast.error('Failed to edit category');
+      toast.error('Не удалось изменить категорию');
     },
   });
 };

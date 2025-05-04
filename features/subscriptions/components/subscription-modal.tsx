@@ -26,10 +26,10 @@ export const SubscriptionModal = () => {
         <DialogHeader className="flex items-center space-y-4">
           <Image src="/logo-dark.svg" alt="Logo" width={36} height={36} />
           <DialogTitle className="text-center">
-            Upgrade to a paid plan
+            Переход на платный план
           </DialogTitle>
           <DialogDescription className="text-center">
-            Upgrade to a paid plan to unlock more features
+            Перейдите на платный план, чтобы разблокировать больше функций
           </DialogDescription>
         </DialogHeader>
         <Separator />
@@ -37,17 +37,17 @@ export const SubscriptionModal = () => {
           <li className="flex items-center">
             <CheckCircle2 className="size-5 mr-2 fill-blue-500 text-white" />
             <p className="text-sm text-muted-foreground">
-              Bank account syncing
+              Синхронизация банковского счета
             </p>
           </li>
           <li className="flex items-center">
             <CheckCircle2 className="size-5 mr-2 fill-blue-500 text-white" />
-            <p className="text-sm text-muted-foreground">Upload CSV files</p>
+            <p className="text-sm text-muted-foreground">Загрузка CSV файлов</p>
           </li>
           <li className="flex items-center">
             <CheckCircle2 className="size-5 mr-2 fill-blue-500 text-white" />
             <p className="text-sm text-muted-foreground">
-              Different chart types
+              Разные типы графиков
             </p>
           </li>
         </ul>
@@ -57,7 +57,7 @@ export const SubscriptionModal = () => {
             disabled={checkout.isPending}
             onClick={() => checkout.mutate()}
           >
-            Upgrade
+            Улучшить
           </Button>
         </DialogFooter>
       </DialogContent>

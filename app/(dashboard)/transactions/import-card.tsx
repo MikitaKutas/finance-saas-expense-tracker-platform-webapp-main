@@ -108,11 +108,11 @@ export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
           <CardTitle className="text-xl line-clamp-1">
-            Import Transaction
+            Импорт операций
           </CardTitle>
           <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
             <Button className="w-full lg:w-auto" onClick={onCancel} size="sm">
-              Cancel
+              Отмена
             </Button>
             <Button
               size="sm"
@@ -120,7 +120,7 @@ export const ImportCard = ({ data, onCancel, onSubmit }: Props) => {
               disabled={progress < requiredOptions.length}
               onClick={handleContinue}
             >
-              Continue ({progress}/ {requiredOptions.length})
+              Продолжить ({progress}/ {requiredOptions.length})
             </Button>
           </div>
         </CardHeader>

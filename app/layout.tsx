@@ -5,15 +5,17 @@ import { ClerkProvider } from '@clerk/nextjs';
 import { Toaster } from '@/components/ui/sonner';
 import { QueryProvider } from '@/providers/query-provider';
 import { SheetProvider } from '@/providers/sheet-provider';
+import { ruRU } from "@clerk/localizations";
 
 import './globals.css';
+import React from "react";
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ subsets: ['cyrillic'] });
 
 export const metadata: Metadata = {
-  title: 'Finance Sass Expense Tracker Platform',
+  title: 'Финансовая SaaS Платформа учета расходов',
   description:
-    'Finance SaaS Platform with ability to track your income and expenses',
+    'Платформа для учета доходов и расходов',
 };
 
 export default function RootLayout({
@@ -22,10 +24,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en">
+    <ClerkProvider localization={ruRU}>
+      <html lang="ru">
         <body className={inter.className}>
-          {/* The QueryProvider component is a client component. However, wrapping components with QueryProvider does not automatically make all child components client components. */}
           <QueryProvider>
             <SheetProvider />
             <Toaster />

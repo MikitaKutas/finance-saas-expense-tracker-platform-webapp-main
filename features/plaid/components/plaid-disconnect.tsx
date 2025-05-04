@@ -7,8 +7,8 @@ import { useConfirm } from '@/hooks/use-confirm';
 
 export const PlaidDisconnect = () => {
   const [Dialog, confirm] = useConfirm(
-    'Are you sure?',
-    'This will disconnect your bank account, and remove all associated data.'
+    'Вы уверены?',
+    'Это отключит ваш банковский счет и удалит все связанные данные.'
   );
   const deleteConnectedBank = useDeleteConnectedBank();
 
@@ -29,7 +29,7 @@ export const PlaidDisconnect = () => {
         size="sm"
         variant="ghost"
       >
-        Disconnect
+        Отключить
       </Button>
     </>
   );

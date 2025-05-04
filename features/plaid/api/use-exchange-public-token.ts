@@ -30,7 +30,7 @@ export const useExchangePublicToken = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Public token exchanged');
+      toast.success('Публичный токен обменен');
       queryClient.invalidateQueries({queryKey: ['connected-bank']});
       queryClient.invalidateQueries({queryKey: ['summary']});
       queryClient.invalidateQueries({queryKey: ['transactions']});
@@ -38,7 +38,7 @@ export const useExchangePublicToken = () => {
       queryClient.invalidateQueries({queryKey: ['categories']});
     },
     onError: () => {
-      toast.error('Failed to exchange public token');
+      toast.error('Не удалось обменять публичный токен');
     },
   });
 };

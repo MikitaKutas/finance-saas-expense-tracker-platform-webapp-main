@@ -19,12 +19,12 @@ export const useCreateTransaction = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Transaction created :)');
+      toast.success('Транзакция добавлена :)');
       queryClient.invalidateQueries({queryKey: ['transactions']});
       queryClient.invalidateQueries({queryKey: ['summary']});
     },
     onError: () => {
-      toast.error('Failed to create transaction');
+      toast.error('Не удалось добавить транзакцию');
     },
   });
 };

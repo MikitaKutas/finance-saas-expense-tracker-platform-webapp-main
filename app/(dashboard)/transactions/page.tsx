@@ -64,7 +64,7 @@ const TransactionsPage = () => {
     const accountId = await confirm();
 
     if (!accountId) {
-      return toast.error('Please select an account to continue');
+      return toast.error('Пожалуйста, выберите счет для продолжения');
     }
 
     const data = values.map((value) => ({
@@ -115,7 +115,7 @@ const TransactionsPage = () => {
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
           <CardTitle className="text-xl line-clamp-1">
-            Transactions History
+            История операций
           </CardTitle>
           <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
             <Button
@@ -124,7 +124,7 @@ const TransactionsPage = () => {
               size="sm"
             >
               <Plus className="size-4 mr-2" />
-              Add new
+              Добавить
             </Button>
             <UploadButton onUpload={onUpload} />
           </div>

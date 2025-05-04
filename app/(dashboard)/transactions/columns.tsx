@@ -14,6 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Actions } from './actions';
 import { AccountColumn } from './account-column';
 import { CategoryColumn } from './category-column';
+import {ru} from "date-fns/locale";
 
 // 200 because we only want the success one data from the GET API
 export type ResponseType = InferResponseType<
@@ -53,7 +54,7 @@ export const columns: ColumnDef<ResponseType>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Date
+          Дата
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -61,7 +62,7 @@ export const columns: ColumnDef<ResponseType>[] = [
     cell: ({ row }) => {
       const date = row.getValue('date') as Date;
 
-      return <span>{format(date, 'dd MMMM, yyyy')}</span>;
+      return <span>{format(date, 'dd MMMM, yyyy', { locale: ru })}</span>;
     },
   },
   {
@@ -72,7 +73,7 @@ export const columns: ColumnDef<ResponseType>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Category
+          Категория
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -95,7 +96,7 @@ export const columns: ColumnDef<ResponseType>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Payee
+          Получатель
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -109,7 +110,7 @@ export const columns: ColumnDef<ResponseType>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Amount
+          Сумма
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );
@@ -135,7 +136,7 @@ export const columns: ColumnDef<ResponseType>[] = [
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
         >
-          Account
+          Счет
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       );

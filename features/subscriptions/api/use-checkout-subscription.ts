@@ -25,7 +25,7 @@ export const useCheckoutSubscription = () => {
       window.location.href = data || '';
     },
     onError: () => {
-      toast.error('Failed to create URL');
+      toast.error('Не удалось создать URL');
     },
   });
 };

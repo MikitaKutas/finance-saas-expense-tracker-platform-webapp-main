@@ -23,13 +23,13 @@ export const useBulkDeleteCategories = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Categories deleted :)');
+      toast.success('Категории удалены :)');
       // refetch all categories everytime you create a new category
       queryClient.invalidateQueries({queryKey: ['categories']});
       queryClient.invalidateQueries({queryKey: ['summary']});
     },
     onError: () => {
-      toast.error('Failed to delete categories');
+      toast.error('Не удалось удалить категории');
     },
   });
 };

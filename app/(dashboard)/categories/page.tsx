@@ -43,11 +43,11 @@ const CategoriesPage = () => {
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="gap-y-2 lg:flex-row lg:items-center lg:justify-between">
           <CardTitle className="text-xl line-clamp-1">
-            Categories Page
+            Категории
           </CardTitle>
           <Button onClick={newCategory.onOpen} size="sm">
             <Plus className="size-4 mr-2" />
-            Add new
+            Добавить новую
           </Button>
         </CardHeader>
         <CardContent>

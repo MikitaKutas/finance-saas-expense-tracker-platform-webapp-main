@@ -12,23 +12,23 @@ import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
 const routes = [
   {
     href: '/',
-    label: 'Dashboard',
+    label: 'Главная',
   },
   {
     href: '/transactions',
-    label: 'Transactions',
+    label: 'Операции',
   },
   {
     href: '/accounts',
-    label: 'Accounts',
+    label: 'Счета',
   },
   {
     href: '/categories',
-    label: 'Categories',
+    label: 'Категории',
   },
   {
     href: '/settings',
-    label: 'Settings',
+    label: 'Настройки',
   },
 ];
 

@@ -49,7 +49,7 @@ export const PlaidConnect = () => {
 
   return (
     <Button onClick={onClick} disabled={isDisabled} size="sm" variant="ghost">
-      Connect
+      Подключить
     </Button>
   );
 };

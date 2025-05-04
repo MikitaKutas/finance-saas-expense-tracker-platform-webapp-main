@@ -24,7 +24,7 @@ export const useDeleteConnectedBank = () => {
       return await response.json();
     },
     onSuccess: () => {
-      toast.success('Connected bank deleted');
+      toast.success('Подключенный банк удален');
       queryClient.invalidateQueries({queryKey: ['connected-bank']});
       queryClient.invalidateQueries({queryKey: ['summary']});
       queryClient.invalidateQueries({queryKey: ['transactions']});
@@ -32,7 +32,7 @@ export const useDeleteConnectedBank = () => {
       queryClient.invalidateQueries({queryKey: ['categories']});
     },
     onError: () => {
-      toast.error('Failed to delete connected bank');
+      toast.error('Не удалось удалить подключенный банк');
     },
   });
 };
