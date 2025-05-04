@@ -23,6 +23,8 @@ export const Select = ({
   options = [],
   placeholder,
 }: Props) => {
+  const formatCreateLabel = (inputValue: string) => `Создать "${inputValue}"`;
+
   const onSelect = (option: SingleValue<{ label: string; value: string }>) => {
     onChange(option?.value);
   };
@@ -44,6 +46,7 @@ export const Select = ({
           },
         }),
       }}
+      formatCreateLabel={formatCreateLabel}
       value={formattedValue}
       onChange={onSelect}
       options={options}

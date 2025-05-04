@@ -28,8 +28,8 @@ export const EditAccountSheet = () => {
   const { isOpen, onClose, id } = useOpenAccount();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    'Are you sure?',
-    'You are about to delete these account.'
+    'Вы уверены?',
+    'Вы собираетесь удалить этот счет.'
   );
 
   const accountQuery = useGetAccount(id);
@@ -71,8 +71,8 @@ export const EditAccountSheet = () => {
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit Account</SheetTitle>
-            <SheetDescription>Edit an existing account.</SheetDescription>
+            <SheetTitle>Изменить счет</SheetTitle>
+            <SheetDescription>Редактировать существующий счет</SheetDescription>
           </SheetHeader>
           {isLoading ? (
             <div className="absolute inset-0 flex items-center justify-center">

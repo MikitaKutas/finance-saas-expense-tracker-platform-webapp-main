@@ -65,8 +65,8 @@ export const NewTransactionSheet = () => {
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="space-y-4">
         <SheetHeader>
-          <SheetTitle>New Transaction</SheetTitle>
-          <SheetDescription>Add a new transaction</SheetDescription>
+          <SheetTitle>Новая операция</SheetTitle>
+          <SheetDescription>Добавить новую операцию</SheetDescription>
         </SheetHeader>
         {isLoading ? (
           <div className="absolute inset-0 flex items-center justify-center">

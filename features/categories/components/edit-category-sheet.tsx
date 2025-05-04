@@ -28,8 +28,8 @@ export const EditCategorySheet = () => {
   const { isOpen, onClose, id } = useOpenCategory();
 
   const [ConfirmDialog, confirm] = useConfirm(
-    'Are you sure?',
-    'You are about to delete these category.'
+    'Вы уверены?',
+    'Вы собираетесь удалить эту категорию.'
   );
 
   const categoryQuery = useGetCategory(id);
@@ -71,8 +71,8 @@ export const EditCategorySheet = () => {
       <Sheet open={isOpen} onOpenChange={onClose}>
         <SheetContent className="space-y-4">
           <SheetHeader>
-            <SheetTitle>Edit Category</SheetTitle>
-            <SheetDescription>Edit an existing category.</SheetDescription>
+            <SheetTitle>Изменить категорию</SheetTitle>
+            <SheetDescription>Редактировать существующую категорию</SheetDescription>
           </SheetHeader>
           {isLoading ? (
             <div className="absolute inset-0 flex items-center justify-center">

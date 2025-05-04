@@ -35,9 +35,9 @@ export const NewCategorySheet = () => {
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="space-y-4">
         <SheetHeader>
-          <SheetTitle>New Category</SheetTitle>
+          <SheetTitle>Новая категория</SheetTitle>
           <SheetDescription>
-            Create a new category to organize your transactions.
+            Создайте новую категорию для организации ваших операций.
           </SheetDescription>
         </SheetHeader>
         <CategoryForm

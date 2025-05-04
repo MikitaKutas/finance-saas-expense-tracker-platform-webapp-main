@@ -61,11 +61,11 @@ export const AccountForm = ({
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Название</FormLabel>
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="e.g. Cash, Bank, Credit Card"
+                  placeholder="например: Наличные, Банк, Кредитная карта"
                   {...field}
                   // useForm handles all the event handlers for us
                 />
@@ -75,7 +75,7 @@ export const AccountForm = ({
         />
 
         <Button className="w-full" disabled={disabled}>
-          {id ? 'Save changes' : 'Create Account'}
+          {id ? 'Сохранить изменения' : 'Создать счет'}
         </Button>
 
         {/* !!id === id we've written like this so because it is a boolean */}
@@ -88,7 +88,7 @@ export const AccountForm = ({
             variant="outline"
           >
             <Trash className="size-4 mr-2" />
-            <span className="ml-2">Delete Account</span>
+            <span className="ml-2">Удалить счет</span>
           </Button>
         )}
       </form>

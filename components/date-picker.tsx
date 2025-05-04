@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import {ru} from "date-fns/locale";
 
 type Props = {
   value?: Date;
@@ -31,7 +32,7 @@ export const DatePicker = ({ value, onChange, disabled }: Props) => {
           )}
         >
           <CalendarIcon className="size-4 mr-2" />
-          {value ? format(value, 'PPP') : <span>Pick a date</span>}
+          {value ? format(value, 'PPP', { locale: ru }) : <span>Выберите дату</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent>
@@ -41,6 +42,7 @@ export const DatePicker = ({ value, onChange, disabled }: Props) => {
           onSelect={onChange}
           disabled={disabled}
           initialFocus
+          locale={ru}
         />
       </PopoverContent>
     </Popover>

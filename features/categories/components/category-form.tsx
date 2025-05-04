@@ -61,11 +61,11 @@ export const CategoryForm = ({
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Name</FormLabel>
+              <FormLabel>Название</FormLabel>
               <FormControl>
                 <Input
                   disabled={disabled}
-                  placeholder="e.g. Food, Travel, Health, etc."
+                  placeholder="например: Продукты, Транспорт, Развлечения"
                   {...field}
                   // useForm handles all the event handlers for us
                 />
@@ -75,7 +75,7 @@ export const CategoryForm = ({
         />
 
         <Button className="w-full" disabled={disabled}>
-          {id ? 'Save changes' : 'Create category'}
+          {id ? 'Сохранить изменения' : 'Создать категорию'}
         </Button>
 
         {/* !!id === id we've written like this so because it is a boolean */}
@@ -88,7 +88,7 @@ export const CategoryForm = ({
             variant="outline"
           >
             <Trash className="size-4 mr-2" />
-            <span className="ml-2">Delete category</span>
+            <span className="ml-2">Удалить категорию</span>
           </Button>
         )}
       </form>
