@@ -2,12 +2,13 @@
 
 import { toast } from 'sonner';
 import { useState } from 'react';
-import { Loader2, Plus } from 'lucide-react';
+import { Loader2, Plus, ArrowLeftRight } from 'lucide-react';
 
 import { useGetTransactions } from '@/features/transactions/api/use-get-transactions';
 import { useNewTransaction } from '@/features/transactions/hooks/use-new-transaction';
 import { useBulkCreateTransactions } from '@/features/transactions/api/use-bulk-create-transactions';
 import { useBulkDeleteTransactions } from '@/features/transactions/api/use-bulk-delete-transactions';
+import { useTransfer } from '@/features/transactions/hooks/use-transfer';
 
 import { useSelectAccount } from '@/features/accounts/hooks/use-select-account';
 
@@ -20,6 +21,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { columns } from './columns';
 import { ImportCard } from './import-card';
 import { UploadButton } from './upload-button';
+import { NewTransferSheet } from '@/features/transactions/components/new-transfer-sheet';
 
 enum VARIANTS {
   LIST = 'LIST',
@@ -51,6 +53,7 @@ const TransactionsPage = () => {
   const createTransactions = useBulkCreateTransactions();
   const deleteTransactions = useBulkDeleteTransactions();
   const newTransaction = useNewTransaction();
+  const transfer = useTransfer();
   const transactionsQuery = useGetTransactions();
   const transactions = transactionsQuery.data ?? [];
 
@@ -118,14 +121,24 @@ const TransactionsPage = () => {
             История операций
           </CardTitle>
           <div className="flex flex-col lg:flex-row gap-y-2 items-center gap-x-2">
-            <Button
-              className="w-full lg:w-auto"
-              onClick={newTransaction.onOpen}
-              size="sm"
-            >
-              <Plus className="size-4 mr-2" />
-              Добавить
-            </Button>
+            <div className="flex gap-2 w-full lg:w-auto flex-col lg:flex-row">
+              <Button
+                className="w-full lg:w-auto"
+                onClick={newTransaction.onOpen}
+                size="sm"
+              >
+                <Plus className="size-4 mr-2" />
+                Добавить
+              </Button>
+              <Button
+                className="w-full lg:w-auto"
+                onClick={transfer.onOpen}
+                size="sm"
+              >
+                <ArrowLeftRight className="size-4 mr-2" />
+                Перевод
+              </Button>
+            </div>
             <UploadButton onUpload={onUpload} />
           </div>
         </CardHeader>
@@ -142,6 +155,7 @@ const TransactionsPage = () => {
           />
         </CardContent>
       </Card>
+      <NewTransferSheet isOpen={transfer.isOpen} onClose={transfer.onClose} />
     </div>
   );
 };
