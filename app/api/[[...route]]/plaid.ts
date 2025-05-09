@@ -125,9 +125,14 @@ const app = new Hono()
         access_token: connectedBank.accessToken,
       });
 
+      console.log('Получены данные из Plaid:');
+      console.log(`- Добавленные транзакции: ${plaidTransactions.data.added.length}`);
+
       const plaidAccounts = await client.accountsGet({
         access_token: connectedBank.accessToken,
       });
+
+      console.log(`Получено ${plaidAccounts.data.accounts.length} счетов из Plaid`);
 
       const plaidCategories = await client.categoriesGet({});
       
@@ -152,6 +157,7 @@ const app = new Hono()
             name: account.name,
             plaidId: account.account_id,
             userId: auth.userId,
+            amount: convertAmountToMilliUnits(account.balances.current || 0),
           }))
         )
         .returning();
@@ -178,28 +184,95 @@ const app = new Hono()
             (category) => category.plaidId === transaction.category_id
           );
 
+          if (!account) {
+            console.log(`Не найден соответствующий счет для транзакции ${transaction.transaction_id}, account_id: ${transaction.account_id}`);
+            return acc;
+          }
+
+          if (typeof transaction.amount !== 'number') {
+            console.log(`Некорректный формат суммы для транзакции ${transaction.transaction_id}: ${transaction.amount} (тип: ${typeof transaction.amount})`);
+            return acc;
+          }
+
           const amountInMiliunits = convertAmountToMilliUnits(
             transaction.amount
           );
 
-          if (account) {
-            acc.push({
-              id: createId(),
-              amount: amountInMiliunits,
-              payee: transaction.merchant_name || transaction.name,
-              notes: transaction.name,
-              date: new Date(transaction.date),
-              accountId: account.id,
-              categoryId: category?.id,
-            });
+          let transactionDate;
+          try {
+            transactionDate = new Date(transaction.date);
+            if (isNaN(transactionDate.getTime())) {
+              throw new Error("Некорректная дата");
+            }
+          } catch (e) {
+            console.log(`Некорректный формат даты для транзакции ${transaction.transaction_id}: ${transaction.date}`);
+            transactionDate = new Date();
           }
+
+          console.log(`Обработка транзакции: ${transaction.name}, сумма: ${transaction.amount}, счет: ${transaction.account_id} -> ${account.id}`);
+          
+          acc.push({
+            id: createId(),
+            amount: amountInMiliunits,
+            payee: transaction.merchant_name || transaction.name,
+            notes: transaction.name,
+            date: transactionDate,
+            accountId: account.id,
+            categoryId: category?.id,
+          });
+          
           return acc;
         },
         [] as (typeof transactions.$inferInsert)[]
       );
 
+      console.log(`Найдено ${plaidTransactions.data.added.length} транзакций в Plaid`);
+      console.log(`Сформировано ${newTransactionsValues.length} транзакций для добавления`);
+
       if (newTransactionsValues.length > 0) {
-        await db.insert(transactions).values(newTransactionsValues);
+        const validTransactions = newTransactionsValues.filter(transaction => {
+          if (!transaction.accountId || !transaction.payee || !transaction.date) {
+            console.log(`Пропускаем транзакцию с неполными данными: ${JSON.stringify(transaction)}`);
+            return false;
+          }
+          
+          if (typeof transaction.amount !== 'number') {
+            console.log(`Пропускаем транзакцию с некорректной суммой: ${JSON.stringify(transaction)}`);
+            return false;
+          }
+          
+          return true;
+        });
+        
+        console.log(`Валидных транзакций: ${validTransactions.length} из ${newTransactionsValues.length}`);
+        
+        const batchSize = 100;
+        const batches = [];
+        
+        for (let i = 0; i < validTransactions.length; i += batchSize) {
+          batches.push(validTransactions.slice(i, i + batchSize));
+        }
+        
+        try {
+          console.log('Начинаем вставку транзакций в БД...');
+          
+          for (let i = 0; i < batches.length; i++) {
+            console.log(`Вставка пакета ${i+1}/${batches.length} (${batches[i].length} транзакций)...`);
+            await db.insert(transactions).values(batches[i]);
+          }
+          
+          console.log(`Успешно вставлено ${validTransactions.length} транзакций`);
+        } catch (error) {
+          console.error('Ошибка при вставке транзакций:', error);
+          // Возвращаем ошибку клиенту, но продолжаем работу, так как счета и категории уже созданы
+          return c.json({ 
+            ok: true, 
+            warning: "Успешно подключено к банку, но не удалось импортировать транзакции",
+            error: error instanceof Error ? error.message : String(error)
+          }, 200);
+        }
+      } else {
+        console.log('Нет транзакций для добавления из Plaid');
       }
 
       return c.json({ ok: true }, 200);

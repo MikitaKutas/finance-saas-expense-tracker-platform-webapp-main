@@ -1,5 +1,6 @@
 import { IconType } from 'react-icons';
 import { VariantProps, cva } from 'class-variance-authority';
+import { FaExclamationTriangle } from 'react-icons/fa';
 
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn, formatCurrency, formatPercentage } from '@/lib/utils';
@@ -59,6 +60,9 @@ export const DataCard = ({
   variant,
   percentageChange = 0,
 }: DataCardProps) => {
+  const isNegative = value < 0;
+  const displayVariant = isNegative && title === "Остаток" ? "danger" : variant;
+  
   return (
     <Card className="border-none drop-shadow-sm">
       <CardHeader className="flex flew-row items-center justify-between gap-x-4">
@@ -69,22 +73,30 @@ export const DataCard = ({
           </CardDescription>
         </div>
 
-        <div className={cn(boxVariant({ variant }))}>
-          <Icon className={cn(iconVariant({ variant }))} />
+        <div className={cn(boxVariant({ variant: displayVariant }))}>
+          <Icon className={cn(iconVariant({ variant: displayVariant }))} />
         </div>
       </CardHeader>
 
       <CardContent>
-        <h1 className="font-bold text-2xl mb-2 line-clamp-1 break-all">
-          <CountUp
-            preserveValue
-            start={0}
-            end={value}
-            decimals={2}
-            decimalPlaces={2}
-            formattingFn={formatCurrency}
-          />
-        </h1>
+        <div className="flex items-center gap-2 mb-2">
+          <h1 className={cn(
+            "font-bold text-2xl line-clamp-1 break-all",
+            isNegative && title === "Остаток" && "text-rose-500"
+          )}>
+            <CountUp
+              preserveValue
+              start={0}
+              end={value}
+              decimals={2}
+              decimalPlaces={2}
+              formattingFn={formatCurrency}
+            />
+          </h1>
+          {isNegative && title === "Остаток" && (
+            <FaExclamationTriangle className="text-rose-500" />
+          )}
+        </div>
         <p
           className={cn(
             'text-muted-foreground text-sm line-clamp-1',

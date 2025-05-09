@@ -46,7 +46,7 @@ const app = new Hono().get(
       startDate: Date,
       endDate: Date
     ) {
-      return await db
+      return db
         .select({
           income:
             sql`SUM(CASE WHEN ${transactions.amount} >= 0 THEN ${transactions.amount} ELSE 0 END)`.mapWith(

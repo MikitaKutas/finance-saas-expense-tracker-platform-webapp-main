@@ -6,7 +6,7 @@ import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
 import { zValidator } from '@hono/zod-validator';
 
 import { db } from '@/db/drizzle';
-import { accounts, insertAccountSchema } from '@/db/schema';
+import { accounts } from '@/db/schema';
 
 // chain the handlers so that the types are always inferred
 const app = new Hono()
@@ -23,6 +23,7 @@ const app = new Hono()
       .select({
         id: accounts.id,
         name: accounts.name,
+        amount: accounts.amount,
       })
       .from(accounts)
       .where(eq(accounts.userId, auth.userId));
@@ -55,6 +56,7 @@ const app = new Hono()
           // this accounts variable is the schema
           id: accounts.id,
           name: accounts.name,
+          amount: accounts.amount,
         })
         .from(accounts)
         .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)));
@@ -72,8 +74,9 @@ const app = new Hono()
     // validate using zod what kind of json this POST request accepts by adding a validator zValidator
     zValidator(
       'json',
-      insertAccountSchema.pick({
-        name: true,
+      z.object({
+        name: z.string(),
+        amount: z.number().optional(),
       })
     ),
     async (c) => {
@@ -91,7 +94,8 @@ const app = new Hono()
         .values({
           id: createId(),
           userId: auth.userId,
-          ...values,
+          name: values.name,
+          amount: values.amount || 0,
         })
         .returning();
 
@@ -141,8 +145,9 @@ const app = new Hono()
     ),
     zValidator(
       'json',
-      insertAccountSchema.pick({
-        name: true,
+      z.object({
+        name: z.string(),
+        amount: z.number().optional(),
       })
     ),
     async (c) => {
@@ -160,7 +165,10 @@ const app = new Hono()
 
       const [data] = await db
         .update(accounts)
-        .set(values)
+        .set({
+          name: values.name,
+          ...(values.amount !== undefined && { amount: values.amount }),
+        })
         .where(and(eq(accounts.userId, auth.userId), eq(accounts.id, id)))
         .returning();
 

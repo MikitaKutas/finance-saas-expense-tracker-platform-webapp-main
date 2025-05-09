@@ -12,19 +12,21 @@ import {
   FormItem,
   FormLabel,
 } from '@/components/ui/form';
+import { AmountInput } from '@/components/amount-input';
+import { convertAmountToMilliUnits } from '@/lib/utils';
 
-import { insertAccountSchema } from '@/db/schema';
-
-const formSchema = insertAccountSchema.pick({
-  name: true,
+const formSchema = z.object({
+  name: z.string().min(1, "Название обязательно"),
+  amount: z.string()
 });
 
-type FormValues = z.input<typeof formSchema>;
+type FormValues = z.infer<typeof formSchema>;
+type ApiFormValues = { name: string; amount: number };
 
 type Props = {
   id?: string;
   defaultValues?: FormValues;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: ApiFormValues) => void;
   onDelete?: () => void;
   disabled?: boolean;
 };
@@ -38,11 +40,17 @@ export const AccountForm = ({
 }: Props) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
-    defaultValues: defaultValues,
+    defaultValues: defaultValues || { name: '', amount: '0' },
   });
 
   const handleSubmit = (values: FormValues) => {
-    onSubmit(values);
+    const amount = parseFloat(values.amount || '0');
+    const amountInMilliUnits = convertAmountToMilliUnits(amount);
+    
+    onSubmit({
+      name: values.name,
+      amount: amountInMilliUnits,
+    });
   };
 
   const handleDelete = () => {
@@ -55,7 +63,6 @@ export const AccountForm = ({
         onSubmit={form.handleSubmit(handleSubmit)}
         className="space-y-4 pt-4"
       >
-        {/* "name" comes from the schema */}
         <FormField
           name="name"
           control={form.control}
@@ -67,7 +74,23 @@ export const AccountForm = ({
                   disabled={disabled}
                   placeholder="например: Наличные, Банк, Кредитная карта"
                   {...field}
-                  // useForm handles all the event handlers for us
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          name="amount"
+          control={form.control}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Остаток</FormLabel>
+              <FormControl>
+                <AmountInput
+                  {...field}
+                  disabled={disabled}
+                  placeholder="0.00"
                 />
               </FormControl>
             </FormItem>
@@ -78,7 +101,6 @@ export const AccountForm = ({
           {id ? 'Сохранить изменения' : 'Создать счет'}
         </Button>
 
-        {/* !!id === id we've written like this so because it is a boolean */}
         {!!id && (
           <Button
             type="button"

@@ -138,7 +138,6 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      // insert will not return anything that's why we chain it with .returning()
       const [data] = await db
         .insert(transactions)
         .values({
@@ -146,6 +145,13 @@ const app = new Hono()
           ...values,
         })
         .returning();
+
+      await db
+        .update(accounts)
+        .set({
+          amount: sql`${accounts.amount} + ${values.amount}`,
+        })
+        .where(eq(accounts.id, values.accountId));
 
       return c.json({ data });
     }
@@ -179,6 +185,21 @@ const app = new Hono()
         )
         .returning();
 
+      const accountAmounts = values.reduce((acc, transaction) => {
+        const { accountId, amount } = transaction;
+        acc[accountId] = (acc[accountId] || 0) + amount;
+        return acc;
+      }, {} as Record<string, number>);
+
+      for (const [accountId, amount] of Object.entries(accountAmounts)) {
+        await db
+          .update(accounts)
+          .set({
+            amount: sql`${accounts.amount} + ${amount}`,
+          })
+          .where(eq(accounts.id, accountId));
+      }
+
       return c.json({ data });
     }
   )
@@ -200,29 +221,53 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      const transactionsToDelete = db.$with('transactions_to_delete').as(
-        db
-          .select({ id: transactions.id })
-          .from(transactions)
-          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(
-            and(
-              inArray(transactions.id, values.ids),
-              eq(accounts.userId, auth.userId)
-            )
-          )
-      );
+      const transactionsToAdjust = await db
+        .select({
+          id: transactions.id,
+          accountId: transactions.accountId,
+          amount: transactions.amount,
+        })
+        .from(transactions)
+        .where(inArray(transactions.id, values.ids));
 
-      const data = await db
-        .with(transactionsToDelete)
-        .delete(transactions)
-        // only delete transactions where id matches the list of ids which is transactionsToDelete
+      if (transactionsToAdjust.length === 0) {
+        return c.json({ data: [] });
+      }
+
+      // Группируем транзакции по счетам
+      const accountAmounts = transactionsToAdjust.reduce((acc, transaction) => {
+        const { accountId, amount } = transaction;
+        acc[accountId] = (acc[accountId] || 0) + amount;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Обновляем балансы для каждого счета
+      for (const [accountId, amount] of Object.entries(accountAmounts)) {
+        await db
+          .update(accounts)
+          .set({
+            amount: sql`${accounts.amount} - ${amount}`,
+          })
+          .where(eq(accounts.id, accountId));
+      }
+
+      // Выбираем идентификаторы транзакций для удаления
+      const transactionsToDeleteIds = await db
+        .select({ id: transactions.id })
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
         .where(
-          inArray(
-            transactions.id,
-            sql`(select id from ${transactionsToDelete})`
+          and(
+            inArray(transactions.id, values.ids),
+            eq(accounts.userId, auth.userId)
           )
-        )
+        );
+        
+      const idsToDelete = transactionsToDeleteIds.map(t => t.id);
+      
+      const data = await db
+        .delete(transactions)
+        .where(inArray(transactions.id, idsToDelete))
         .returning({
           id: transactions.id,
         });
@@ -259,24 +304,57 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      const transactionsToUpdate = db.$with('transactions_to_update').as(
-        db
-          .select({ id: transactions.id })
-          .from(transactions)
-          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)))
-      );
+      const [currentTransaction] = await db
+        .select({
+          accountId: transactions.accountId,
+          amount: transactions.amount,
+        })
+        .from(transactions)
+        .where(eq(transactions.id, id));
 
+      if (!currentTransaction) {
+        return c.json({ error: 'Not found' }, 404);
+      }
+
+      const amountDifference = values.amount - currentTransaction.amount;
+      
+      if (currentTransaction.accountId !== values.accountId) {
+        await db
+          .update(accounts)
+          .set({
+            amount: sql`${accounts.amount} - ${currentTransaction.amount}`,
+          })
+          .where(eq(accounts.id, currentTransaction.accountId));
+        
+        await db
+          .update(accounts)
+          .set({
+            amount: sql`${accounts.amount} + ${values.amount}`,
+          })
+          .where(eq(accounts.id, values.accountId));
+      } else {
+        await db
+          .update(accounts)
+          .set({
+            amount: sql`${accounts.amount} + ${amountDifference}`,
+          })
+          .where(eq(accounts.id, values.accountId));
+      }
+
+      const transactionIds = await db
+        .select({ id: transactions.id })
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)));
+      
+      if (transactionIds.length === 0) {
+        return c.json({ error: 'Not found' }, 404);
+      }
+      
       const [data] = await db
-        .with(transactionsToUpdate)
         .update(transactions)
         .set(values)
-        .where(
-          inArray(
-            transactions.id,
-            sql`(select id from ${transactionsToUpdate})`
-          )
-        )
+        .where(eq(transactions.id, id))
         .returning();
 
       if (!data) {
@@ -307,23 +385,38 @@ const app = new Hono()
         return c.json({ error: 'Unauthorized' }, 401);
       }
 
-      const transactionsToDelete = db.$with('transactions_to_delete').as(
-        db
-          .select({ id: transactions.id })
-          .from(transactions)
-          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
-          .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)))
-      );
+      const [transactionToDelete] = await db
+        .select({
+          accountId: transactions.accountId,
+          amount: transactions.amount,
+        })
+        .from(transactions)
+        .where(eq(transactions.id, id));
+
+      if (!transactionToDelete) {
+        return c.json({ error: 'Not found' }, 404);
+      }
+
+      await db
+        .update(accounts)
+        .set({
+          amount: sql`${accounts.amount} - ${transactionToDelete.amount}`,
+        })
+        .where(eq(accounts.id, transactionToDelete.accountId));
+
+      const transactionIdsToDelete = await db
+        .select({ id: transactions.id })
+        .from(transactions)
+        .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+        .where(and(eq(transactions.id, id), eq(accounts.userId, auth.userId)));
+      
+      if (transactionIdsToDelete.length === 0) {
+        return c.json({ error: 'Not found' }, 404);
+      }
 
       const [data] = await db
-        .with(transactionsToDelete)
         .delete(transactions)
-        .where(
-          inArray(
-            transactions.id,
-            sql`(select id from ${transactionsToDelete})`
-          )
-        )
+        .where(eq(transactions.id, id))
         .returning({ id: transactions.id });
 
       if (!data) {
