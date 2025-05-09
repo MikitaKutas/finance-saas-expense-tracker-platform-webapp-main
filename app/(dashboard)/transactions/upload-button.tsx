@@ -15,7 +15,7 @@ export const UploadButton = ({ onUpload }: Props) => {
 
   if (shouldBlock) {
     return (
-      <Button size="sm" className="w-full lg:w-auto" onClick={triggerPaywall}>
+      <Button size="sm" className="w-full lg:w-auto" onClick={triggerPaywall} variant="outline">
         <Upload className="size-4 mr-2" />
         Импортировать
       </Button>
@@ -25,7 +25,7 @@ export const UploadButton = ({ onUpload }: Props) => {
   return (
     <CSVReader onUploadAccepted={onUpload}>
       {({ getRootProps }: any) => (
-        <Button size="sm" className="w-full lg:w-auto" {...getRootProps()}>
+        <Button size="sm" className="w-full lg:w-auto" variant="outline" {...getRootProps()}>
           <Upload className="size-4 mr-2" />
           Импортировать
         </Button>

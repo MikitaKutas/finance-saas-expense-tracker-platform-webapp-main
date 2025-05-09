@@ -45,7 +45,7 @@ const CategoriesPage = () => {
           <CardTitle className="text-xl line-clamp-1">
             Категории
           </CardTitle>
-          <Button onClick={newCategory.onOpen} size="sm">
+          <Button onClick={newCategory.onOpen} size="sm" variant="outline">
             <Plus className="size-4 mr-2" />
             Добавить
           </Button>

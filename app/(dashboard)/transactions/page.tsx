@@ -126,6 +126,7 @@ const TransactionsPage = () => {
                 className="w-full lg:w-auto"
                 onClick={newTransaction.onOpen}
                 size="sm"
+                variant="outline"
               >
                 <Plus className="size-4 mr-2" />
                 Добавить
@@ -134,6 +135,7 @@ const TransactionsPage = () => {
                 className="w-full lg:w-auto"
                 onClick={transfer.onOpen}
                 size="sm"
+                variant="outline"
               >
                 <ArrowLeftRight className="size-4 mr-2" />
                 Перевод

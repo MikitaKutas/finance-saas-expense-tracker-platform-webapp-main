@@ -9,6 +9,7 @@ import { ruRU } from "@clerk/localizations";
 
 import './globals.css';
 import React from "react";
+import {ThemeProvider} from "@/app/providers/theme-provider";
 
 const inter = Inter({ subsets: ['cyrillic'] });
 
@@ -25,13 +26,20 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider localization={ruRU}>
-      <html lang="ru">
+      <html lang="ru" suppressHydrationWarning>
         <body className={inter.className}>
-          <QueryProvider>
-            <SheetProvider />
-            <Toaster />
-            {children}
-          </QueryProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <QueryProvider>
+              <SheetProvider />
+              <Toaster />
+              {children}
+            </QueryProvider>
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>
