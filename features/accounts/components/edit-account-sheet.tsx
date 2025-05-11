@@ -62,8 +62,9 @@ export const EditAccountSheet = () => {
   const defaultValues = accountQuery.data
     ? {
         name: accountQuery.data.name,
+        amount: accountQuery.data.amount.toString()
       }
-    : { name: '' };
+    : { name: '', amount: '0' };
 
   return (
     <>
