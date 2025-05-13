@@ -137,10 +137,7 @@ const app = new Hono()
 
       if (existing) {
         await db
-          .update(subscriptions)
-          .set({
-            status: 'canceled',
-          })
+          .delete(subscriptions)
           .where(eq(subscriptions.subscriptionId, subscription.id));
       }
     }
