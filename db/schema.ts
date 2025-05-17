@@ -1,7 +1,8 @@
 import { z } from 'zod';
 import { createInsertSchema } from 'drizzle-zod';
 import { relations } from 'drizzle-orm';
-import { integer, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { integer, pgTable, text, timestamp, date } from 'drizzle-orm/pg-core';
+import { createId } from '@paralleldrive/cuid2';
 
 export const accounts = pgTable('accounts', {
   id: text('id').primaryKey(),
@@ -80,4 +81,15 @@ export const subscriptions = pgTable('subscriptions', {
   subscriptionId: text('subscription_id').notNull().unique(),
   customerId: text('customer_id'),
   status: text('status').notNull(),
+});
+
+export const plans = pgTable('plans', {
+  id: text('id').primaryKey().$defaultFn(() => createId()),
+  userId: text('user_id').notNull(),
+  accountId: text('account_id').notNull().references(() => accounts.id, { onDelete: 'cascade' }),
+  type: text('type', { enum: ['savings', 'spending'] }).notNull(),
+  amount: integer('amount').notNull(),
+  month: date('month').notNull(),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });

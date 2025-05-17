@@ -8,6 +8,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import NavButton from '@/components/nav-button';
 import { Sheet, SheetContent, SheetTrigger } from './ui/sheet';
+import { usePaywall } from '@/features/subscriptions/hooks/use-paywall';
 
 const routes = [
   {
@@ -27,6 +28,11 @@ const routes = [
     label: 'Категории',
   },
   {
+    href: '/planning',
+    label: 'Планирование',
+    requiresSubscription: true,
+  },
+  {
     href: '/settings',
     label: 'Настройки',
   },
@@ -34,12 +40,17 @@ const routes = [
 
 const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const { shouldBlock, triggerPaywall } = usePaywall();
 
   const router = useRouter();
   const pathName = usePathname();
   const isMobile = useMedia('(max-width: 1024px)', false);
 
-  const onClick = (href: string) => {
+  const onClick = (href: string, requiresSubscription?: boolean) => {
+    if (requiresSubscription && shouldBlock) {
+      triggerPaywall();
+      return;
+    }
     router.push(href);
     setIsOpen(false);
   };
@@ -62,8 +73,9 @@ const Navigation = () => {
               <Button
                 variant={route.href === pathName ? 'secondary' : 'ghost'}
                 key={route.href}
-                onClick={() => onClick(route.href)}
+                onClick={() => onClick(route.href, route.requiresSubscription)}
                 className="w-full justify-start"
+                disabled={route.requiresSubscription && shouldBlock}
               >
                 {route.label}
               </Button>
@@ -82,6 +94,8 @@ const Navigation = () => {
           href={route.href}
           label={route.label}
           isActive={pathName === route.href}
+          disabled={route.requiresSubscription && shouldBlock}
+          onClick={() => onClick(route.href, route.requiresSubscription)}
         />
       ))}
     </nav>

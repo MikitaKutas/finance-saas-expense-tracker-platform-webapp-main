@@ -8,6 +8,7 @@ import categories from './categories';
 import transactions from './transactions';
 import subscriptions from './subscriptions';
 import transfersRoute from './transfers';
+import plans from './plans';
 
 export const runtime = 'nodejs';
 
@@ -20,7 +21,8 @@ const routes = app
   .route('/categories', categories)
   .route('/transactions', transactions)
   .route('/subscriptions', subscriptions)
-  .route('/transfers', transfersRoute);
+  .route('/transfers', transfersRoute)
+  .route('/plans', plans);
 
 export const GET = handle(app);
 export const POST = handle(app);
