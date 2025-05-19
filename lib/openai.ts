@@ -177,3 +177,99 @@ export async function analyzeSubscriptions(transactions: Transaction[]): Promise
     return { hasSubscriptions: false, subscriptions: [], message: '' };
   }
 }
+
+type FinancialAdvice = {
+  message: string;
+  shortTermAdvice: string;
+  longTermAdvice: string | null;
+  isCritical: boolean;
+};
+
+export async function getFinancialAdvice(
+  transactions: Transaction[],
+  plans: {
+    type: 'savings' | 'spending';
+    amount: number;
+    month: string;
+    account: {
+      name: string;
+    };
+  }[]
+): Promise<FinancialAdvice> {
+  if (!process.env.OPENAI_API_KEY || transactions.length === 0) {
+    return {
+      message: '',
+      shortTermAdvice: '',
+      longTermAdvice: null,
+      isCritical: false
+    };
+  }
+
+  try {
+    const prompt = `
+      Проанализируй следующие транзакции и планы пользователя, чтобы дать финансовый совет.
+      
+      Транзакции:
+      ${JSON.stringify(transactions, null, 2)}
+      
+      Планы:
+      ${JSON.stringify(plans, null, 2)}
+      
+      Важно: все суммы в транзакциях и планах указаны в центах. Например, сумма 2500 означает $25.00.
+      В своих рекомендациях используй суммы в центах, добавляя слово "центов" после числа.
+      Например: "рекомендую отложить 5000 центов" вместо "$50.00".
+      
+      Верни ответ в формате JSON:
+      {
+        "message": string, // общее сообщение о текущей финансовой ситуации
+        "shortTermAdvice": string, // конкретные рекомендации на текущий месяц
+        "longTermAdvice": string | null, // рекомендации на долгосрочную перспективу, если есть серьезные проблемы
+        "isCritical": boolean // true, если ситуация критическая и требует немедленного внимания
+      }
+    `;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: [
+        {
+          role: "system",
+          content: `Ты - опытный финансовый аналитик-консультант. Твоя задача - проанализировать финансовую ситуацию пользователя и дать полезные рекомендации.
+
+При анализе:
+1. Оцени текущую финансовую ситуацию
+2. Сравни планы с реальными тратами
+3. Определи, есть ли риски невыполнения планов
+4. Если проблемы серьезные и не могут быть решены в текущем месяце, предложи долгосрочную стратегию
+5. Давай конкретные, практические советы
+6. Используй дружелюбный, но профессиональный тон
+7. Все, кроме названий компаний, должно быть на русском
+8. Все суммы указывай в центах, добавляя слово "центов" после числа
+9. Помни, что суммы в транзакциях указаны в центах
+
+Формат сообщения должен быть примерно таким:
+"На основе анализа ваших транзакций и планов, я вижу следующие моменты: [краткое описание ситуации]. Вот мои рекомендации на текущий месяц: [конкретные советы]. [Если есть серьезные проблемы, добавь рекомендации на долгосрочную перспективу]."`
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const result = completion.choices[0]?.message?.content;
+    if (!result) {
+      throw new Error("OpenAI вернул пустой результат");
+    }
+
+    return JSON.parse(result);
+  } catch (error) {
+    console.error("Ошибка при получении финансового совета:", error);
+    return {
+      message: '',
+      shortTermAdvice: '',
+      longTermAdvice: null,
+      isCritical: false
+    };
+  }
+}

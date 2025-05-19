@@ -164,7 +164,7 @@ export const PlanningCharts = ({ date }: PlanningChartsProps) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD',
-    }).format(value);
+    }).format(value / 100);
   };
 
   const CustomTooltip = ({ active, payload, label }: any) => {

@@ -60,7 +60,7 @@ export const CreatePlan = () => {
 
       const response = await client.api.plans.$post({
         json: {
-          amount: Number(amount),
+          amount: Number(amount) * 100,
           type,
           accountId,
           month: format(date, 'yyyy-MM'),

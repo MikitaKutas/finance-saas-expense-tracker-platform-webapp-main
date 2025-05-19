@@ -57,7 +57,7 @@ interface EditPlanProps {
 
 export const EditPlan = ({ plan }: EditPlanProps) => {
   const [open, setOpen] = useState(false);
-  const [amount, setAmount] = useState(plan.amount.toString());
+  const [amount, setAmount] = useState((plan.amount / 100).toString());
   const [type, setType] = useState<'savings' | 'spending'>(plan.type);
   const [accountId, setAccountId] = useState(plan.accountId);
   const [date, setDate] = useState<Date>(new Date(plan.month));
@@ -83,7 +83,7 @@ export const EditPlan = ({ plan }: EditPlanProps) => {
       const response = await client.api.plans[':id'].$patch({
         param: { id: plan.id },
         json: {
-          amount: Number(amount),
+          amount: Number(amount) * 100,
           type,
           accountId,
           month: format(date, 'yyyy-MM'),
