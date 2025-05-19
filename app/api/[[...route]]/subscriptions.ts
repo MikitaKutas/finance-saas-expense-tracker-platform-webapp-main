@@ -1,12 +1,15 @@
 import { Hono } from 'hono';
-import { eq } from 'drizzle-orm';
+import { eq, and, gte, lte } from 'drizzle-orm';
 import { createId } from '@paralleldrive/cuid2';
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth';
+import { z } from 'zod';
+import { zValidator } from '@hono/zod-validator';
 
 import { db } from '@/db/drizzle';
 import { stripe } from '@/lib/stripe';
-import { subscriptions } from '@/db/schema';
-import {APP_URL} from "@/lib/constants";
+import { subscriptions, transactions, accounts } from '@/db/schema';
+import { APP_URL } from "@/lib/constants";
+import { analyzeSubscriptions } from '@/lib/openai';
 
 const app = new Hono()
   .get('/current', clerkMiddleware(), async (c) => {
@@ -143,6 +146,57 @@ const app = new Hono()
     }
 
     return c.json({}, 200);
+  })
+  .get('/analyze', clerkMiddleware(), async (c) => {
+    const auth = getAuth(c);
+    if (!auth?.userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+
+    const [subscription] = await db
+      .select()
+      .from(subscriptions)
+      .where(eq(subscriptions.userId, auth.userId));
+
+    if (!subscription || subscription.status !== 'active') {
+      return c.json({ error: 'Subscription required' }, 403);
+    }
+
+    const { from, to } = c.req.query();
+    if (!from || !to) {
+      return c.json({ error: 'Missing date range' }, 400);
+    }
+
+    const transactionsList = await db
+      .select({
+        id: transactions.id,
+        amount: transactions.amount,
+        payee: transactions.payee,
+        date: transactions.date,
+        categoryId: transactions.categoryId,
+        notes: transactions.notes,
+      })
+      .from(transactions)
+      .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+      .where(
+        and(
+          eq(accounts.userId, auth.userId),
+          gte(transactions.date, new Date(from)),
+          lte(transactions.date, new Date(to))
+        )
+      );
+
+    const formattedTransactions = transactionsList.map(t => ({
+      id: t.id,
+      amount: t.amount,
+      payee: t.payee,
+      date: t.date.toISOString(),
+      category: t.categoryId,
+      notes: t.notes
+    }));
+
+    const analysis = await analyzeSubscriptions(formattedTransactions);
+    return c.json({ data: analysis });
   });
 
 export default app;

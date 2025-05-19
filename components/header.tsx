@@ -6,6 +6,7 @@ import HeaderLogo from '@/components/header-logo';
 import Navigation from '@/components/navigation';
 import WelcomeMsg from '@/components/welcome-msg';
 import { ThemeSwitcher } from '@/components/theme-switcher';
+import { SubscriptionAlert } from '@/app/(dashboard)/_components/subscription-alert';
 
 const Header = () => {
   return (
@@ -28,6 +29,7 @@ const Header = () => {
         </div>
 
         <WelcomeMsg />
+        <SubscriptionAlert date={new Date()} />
         <Filters />
       </div>
     </header>

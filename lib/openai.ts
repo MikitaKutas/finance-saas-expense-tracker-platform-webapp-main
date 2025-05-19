@@ -86,3 +86,94 @@ async function translateCategoryBatch(categories: string[]): Promise<string[]> {
     return categories;
   }
 }
+
+type Transaction = {
+  id: string;
+  amount: number;
+  payee: string;
+  date: string;
+  category: string | null;
+  notes: string | null;
+};
+
+type SubscriptionAnalysis = {
+  hasSubscriptions: boolean;
+  subscriptions: {
+    description: string;
+    amount: number;
+    frequency: string;
+  }[];
+  message: string;
+};
+
+export async function analyzeSubscriptions(transactions: Transaction[]): Promise<SubscriptionAnalysis> {
+  if (!process.env.OPENAI_API_KEY || transactions.length === 0) {
+    return { hasSubscriptions: false, subscriptions: [], message: '' };
+  }
+
+  try {
+    const prompt = `
+      Проанализируй следующие транзакции и определи, какие из них являются регулярными подписками (ежемесячными, еженедельными или ежедневными).
+      Для каждой подписки укажи её описание, сумму и частоту.
+      Если подписок нет, верни hasSubscriptions: false.
+      
+      Важно: суммы в транзакциях указаны в центах (копейках). Например, сумма 2500 означает $25.00.
+      
+      Транзакции:
+      ${JSON.stringify(transactions, null, 2)}
+      
+      Верни ответ в формате JSON:
+      {
+        "hasSubscriptions": boolean,
+        "subscriptions": [
+          {
+            "description": string,
+            "amount": number, // сумма в центах (копейках)
+            "frequency": "monthly" | "weekly" | "daily"
+          }
+        ],
+        "message": string
+      }
+    `;
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4-turbo-preview",
+      messages: [
+        {
+          role: "system",
+          content: `Ты - дружелюбный финансовый аналитик-помощник. Твоя задача - помочь пользователю отслеживать его регулярные подписки и предупреждать о предстоящих списаниях.
+                    
+                    При анализе подписок:
+                    1. Обрати внимание на регулярные платежи с одинаковыми суммами
+                    2. Определи частоту платежей (ежемесячно, еженедельно, ежедневно)
+                    3. Составь понятное описание каждой подписки
+                    4. В сообщении укажи, что это предупреждение о предстоящих списаниях
+                    5. Напомни, что подписки можно отменить, если они больше не нужны
+                    6. Используй дружелюбный, но профессиональный тон
+                    7. Помни, что суммы в транзакциях указаны в центах (копейках)
+                    8. Все, кроме названий компаний, должно быть на русском, если названия компаний не на русском
+                    
+                    Формат сообщения должен быть примерно таким:
+                    "Я заметил несколько регулярных подписок, которые скоро будут автоматически списаны. Если какие-то из них вам больше не нужны, рекомендую отменить их заранее. Вот список ваших активных подписок:"
+                    
+                    В сообщении НЕ нужно перечислять сами подписки - они будут отображены отдельно в списке ниже.`
+        },
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      response_format: { type: "json_object" }
+    });
+
+    const result = completion.choices[0]?.message?.content;
+    if (!result) {
+      throw new Error("OpenAI вернул пустой результат");
+    }
+
+    return JSON.parse(result);
+  } catch (error) {
+    console.error("Ошибка при анализе подписок:", error);
+    return { hasSubscriptions: false, subscriptions: [], message: '' };
+  }
+}

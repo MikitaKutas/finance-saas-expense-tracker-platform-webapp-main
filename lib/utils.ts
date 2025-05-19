@@ -9,7 +9,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function convertAmountFromMilliUnits(amount: number) {
-  return amount / 1000;
+  return amount / 100;
 }
 
 export function convertAmountToMilliUnits(amount: number) {
@@ -105,5 +105,6 @@ export function formatAmount(amount: number) {
   return new Intl.NumberFormat('ru-RU', {
     style: 'currency',
     currency: 'RUB',
+    minimumFractionDigits: 2,
   }).format(amount / 100);
 }
