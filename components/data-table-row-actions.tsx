@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button';
 import { MoreHorizontal, Pencil, Trash } from 'lucide-react';
 
 
-export function DataTableRowActions<TData>() {
+export function DataTableRowActions({}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
