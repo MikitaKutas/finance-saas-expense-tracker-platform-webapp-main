@@ -96,6 +96,6 @@ export const columns: ColumnDef<Plan>[] = [
   },
   {
     id: 'actions',
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: () => <DataTableRowActions />,
   },
 ]; 
