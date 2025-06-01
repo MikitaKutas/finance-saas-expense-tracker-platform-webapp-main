@@ -47,7 +47,7 @@ export const SubscriptionAlert = ({ date }: SubscriptionAlertProps) => {
   return (
     <Alert variant="default" className="mb-4">
       <AlertCircle className="h-4 w-4 text-yellow-500" />
-      <AlertTitle>AI помошник</AlertTitle>
+      <AlertTitle>AI помощник</AlertTitle>
       <AlertDescription>
         <p className="mb-2">{analysis.message}</p>
         <ul className="list-disc list-inside space-y-1">

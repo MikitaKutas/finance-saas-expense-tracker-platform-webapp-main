@@ -63,12 +63,12 @@ export const AIAdviceModal = ({ date }: AIAdviceModalProps) => {
       <DialogTrigger asChild>
         <Button variant="outline" className="gap-2">
           <Sparkles className="h-4 w-4" />
-          Получить совет от AI помошника
+          Получить совет от AI помощника
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>AI помошник</DialogTitle>
+          <DialogTitle>AI помощник</DialogTitle>
           <DialogDescription>
             Анализ вашей финансовой ситуации и рекомендации
           </DialogDescription>
